@@ -1,0 +1,59 @@
+service: coins
+useDotenv: true
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: python3.8
+  timeout: 30
+  region: us-east-2
+  environment:
+    URI_BASE: ${env:URI_BASE}
+    URI_GLOBAL: ${env:URI_GLOBAL}
+    HOST: ${env:HOST}
+    USER: ${env:USER}
+    PASSWORD: ${env:PASSWORD}
+    DATABASE: ${env:DATABASE}
+    API_KEY: ${env:API_KEY}
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
+
+package:
+  patterns:
+    - '!node_modules/**'
+
+custom:
+  URI_BASE: ${env:URI_BASE}
+  URI_GLOBAL: ${env:URI_GLOBAL}
+  HOST: ${env:HOST}
+  USER: ${env:USER}
+  PASSWORD: ${env:PASSWORD}
+  DATABASE: ${env:DATABASE}
+  API_KEY: ${env:API_KEY}
+  pythonRequirements:
+    dockerizePip: non-linux
+   
+
+functions:
+  coins:
+    handler: src/routes/coins/coins.getPrices
+    events:
+      - httpApi:
+          path: /get/prices
+          method: get
+    schedule: cron(0 */6 8-20 ? * * *)
+  infoGeneral:
+    handler: src/routes/coins/coins.getInfoGeneral
+    events:
+      - httpApi:
+          path: /get/infogeneral
+          method: get
+  data:
+    handler: src/routes/coins/coins.getData
+    events:
+      - httpApi:
+          path: /get/data
+          method: get
