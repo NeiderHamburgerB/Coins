@@ -44,7 +44,7 @@ functions:
       - httpApi:
           path: /get/prices
           method: get
-    schedule: cron(0 */6 8-20 ? * * *)
+      - schedule: cron(0 0/6 * * ? *)
   infoGeneral:
     handler: src/routes/coins/coins.getInfoGeneral
     events:

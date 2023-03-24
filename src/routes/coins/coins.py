@@ -4,8 +4,8 @@ from requests import get
 from src.config.database.provider import connection
 
 def values(connection):
-    btc_query = "SELECT price_usd,created_at FROM btc_prices ORDER BY price_usd DESC"
-    eth_query = "SELECT price_usd,created_at FROM eth_prices ORDER BY price_usd DESC"
+    btc_query = "SELECT price_usd,created_at FROM btc_prices ORDER BY created_at DESC"
+    eth_query = "SELECT price_usd,created_at FROM eth_prices ORDER BY created_at DESC"
     
     cursor = connection.cursor()
 
@@ -31,8 +31,16 @@ def values(connection):
             "dates": btc_dates
         }
     }
+    
+    response = {
+        "statusCode": 200,
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": json.dumps(result, indent=4, sort_keys=True, default=str)
+    }
 
-    return json.dumps(result, indent=4, sort_keys=True, default=str)
+    return response
 
 def getData(event, context):
     connect = connection()
@@ -57,12 +65,15 @@ def getInfoGeneral(event, context):
             'vol_24h': vol_24h
         }) }
         
+        response['headers'] = {'Access-Control-Allow-Origin': '*'}
+
         return response
 
     except Exception as e:
         body = {'message': 'Sorry an error occurred', 'error': str(e)}
         response = {'statusCode': 500, 'body': json.dumps(body)}
-
+        response['headers'] = {'Access-Control-Allow-Origin': '*'}
+        
     return response
    
 
@@ -83,7 +94,8 @@ def save(data,connection):
     except Exception as e:
         body = {'message': 'Sorry an error occurred', 'error': str(e)}
         response = {'statusCode': 500, 'body': json.dumps(body)}
-    
+        response['headers'] = {'Access-Control-Allow-Origin': '*'}
+        
    
 def getPrices(event, context):
     try:
@@ -103,10 +115,14 @@ def getPrices(event, context):
         save(result,connect)
         body = {'data': result}
         response = {'statusCode': 200, 'body': json.dumps(body)}
+        response['headers'] = {'Access-Control-Allow-Origin': '*'}
+        
         
     except Exception as e:
         body = {'message': 'Sorry an error occurred', 'error': str(e)}
         response = {'statusCode': 500, 'body': json.dumps(body)}
+        response['headers'] = {'Access-Control-Allow-Origin': '*'}
+        
 
     return response
 
